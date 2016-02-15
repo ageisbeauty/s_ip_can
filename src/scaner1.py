@@ -14,7 +14,9 @@ import sys
 import os 
 import time 
 import threading 
-#from ctypes.test.test_errno import threading
+import smtplib  
+from email.mime.text import MIMEText  
+from email.header import Header  
   
 def get_os():   #获得os的类型，区分，n和c作用；
     os = platform.system() 
@@ -28,6 +30,7 @@ def get_os():   #获得os的类型，区分，n和c作用；
     
 def ping_ip(ip_str):
     #global j 
+    
     cmd = ["ping", "-{op}".format(op=get_os()),"1",ip_str] 
     output = os.popen(" ".join(cmd)).readlines() 
     
@@ -40,7 +43,13 @@ def ping_ip(ip_str):
             break   #break，用法不熟练；
     if flag: 
         print ("ip: %s is ok "%ip_str)
-            #print(j)
+        #把结果写进txt，发送email；
+        f=open('ip.txt','a')
+        f.write(ip_str)
+        f.write(time.ctime())
+        f.write('\n')
+        
+        #print(j)
         #print('正在操作：',output[0])
 
 #尝试改写多线程模块：
@@ -55,17 +64,49 @@ def find_ip(ip_prefix):
         #t=threading.Thread(ping_ip,(ip,))
         threads.append(t)
         #print(t)
-    
     #for j in range(0,24):    #启动线程个数
     for j in threads:
         j.start()
         #print(j)    #打印threads[]；
-
     #for k in range(0,24):    #等待线程个数；
     for k in threads:
         k.join()
         #threads[k].join()
-     
+        
+def send_email(): 
+    content='测试'
+    sender = 'lw2006wl@126.com'  
+    receiver = 'julietliuw@sina.com'  
+    subject = 'email test'  
+    smtpserver = 'smtp.126.com'  
+    username = 'lw2006wl@126.com'  
+    password = 'liuwei@2006'  
+    
+    #msg = MIMEText('你好,abcd','plain','utf-8')    #下移；
+    
+    #msg['Subject'] = Header(subject, 'utf-8')
+    
+    
+    try:
+        f=open('ip.txt')
+        ip=f.readlines()
+        content="".join(ip)     #记住用法！！！
+        msg = MIMEText(content,'plain','utf-8')
+        msg['Subject'] = Header(subject, 'utf-8')
+        #content=ip
+        smtp = smtplib.SMTP()  
+        smtp.connect('smtp.126.com')  
+        smtp.login(username, password)  
+        smtp.sendmail(sender, receiver, msg.as_string())  
+        smtp.quit()  
+        print('done')
+    except Exception as e:
+        print(str(e))
+         
+    finally:
+        f.close()
+    
+
         
 
 if __name__ == "__main__": #参数172.24.100.1
@@ -79,6 +120,8 @@ if __name__ == "__main__": #参数172.24.100.1
     ip_prefix = '.'.join(args.split('.')[:-1]) 
     print("3,ip_prefix=",ip_prefix)
     find_ip(ip_prefix) 
+    send_email()
+    #print(ip_list)
     print ("end time %s"%time.ctime())
     
     
