@@ -35,12 +35,12 @@ def ping_ip(ip_str):
     for line in list(output): 
         if not line: 
             continue
-        if str(line).upper().find("TTL") >=0: 
+        if str(line).upper().find("TTL") >=0:   #find()返回第一次出现位置；否则为-1；
             flag = True
-            #break
-        if flag: 
-            print ("ip: %s is ok "%ip_str)
-            print(j)
+            break   #break，用法不熟练；
+    if flag: 
+        print ("ip: %s is ok "%ip_str)
+            #print(j)
         #print('正在操作：',output[0])
 
 #尝试改写多线程模块：
@@ -50,6 +50,7 @@ def find_ip(ip_prefix):
     for i in range(1,25):    #循环次数；
         pass
         ip='%s.%s'%(ip_prefix,i)
+        #print("i=",i,"  ip=",ip)
         t=threading.Thread(target=ping_ip,args=(ip,))
         #t=threading.Thread(ping_ip,(ip,))
         threads.append(t)
@@ -58,7 +59,7 @@ def find_ip(ip_prefix):
     #for j in range(0,24):    #启动线程个数
     for j in threads:
         j.start()
-        print(j)
+        #print(j)    #打印threads[]；
 
     #for k in range(0,24):    #等待线程个数；
     for k in threads:
@@ -67,7 +68,7 @@ def find_ip(ip_prefix):
      
         
 
-if __name__ == "__main__": 
+if __name__ == "__main__": #参数172.24.100.1
     print ("start time %s"%time.ctime()) 
     #get_os()
     commandargs = sys.argv[1:]  #args[]是一个参数列表，需要拿出来；
@@ -79,3 +80,8 @@ if __name__ == "__main__":
     print("3,ip_prefix=",ip_prefix)
     find_ip(ip_prefix) 
     print ("end time %s"%time.ctime())
+    
+    
+    
+    
+    
